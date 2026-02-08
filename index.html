@@ -203,11 +203,24 @@
     window.location.href = `yes.html?${qs}`;
   };
 
-  noBtn.onclick = ()=>{
-    alert(lang==='es'
-      ? 'Está bien 🙈 Gracias por ser honesta 💗'
-      : 'That’s okay 🙈 Thanks for being honest 💗');
-  };
+let noClicks = 0;
+const MAX_CLICKS = 100;
+
+noBtn.onclick = () => {
+  noClicks++;
+
+  if (noClicks >= MAX_CLICKS) {
+    noBtn.style.transition = 'opacity .6s ease';
+    noBtn.style.opacity = '0';
+    setTimeout(() => noBtn.remove(), 600);
+    return;
+  }
+
+  // playful dodge movement
+  const x = (Math.random() * 160) - 80;
+  const y = (Math.random() * 80) - 40;
+  noBtn.style.transform = `translate(${x}px, ${y}px)`;
+};
 
   render();
 </script>
