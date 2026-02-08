@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>¡Dijo que sí! 💖</title>
+
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#2a0f2b;
+      --card:rgba(255,255,255,.08);
+      --stroke:rgba(255,255,255,.14);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.75);
+      --shadow:0 20px 60px rgba(0,0,0,.45);
+      --radius:22px;
+      --font:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 700px at 20% 10%, rgba(255,79,166,.20), transparent 60%),
+        radial-gradient(900px 650px at 80% 15%, rgba(120,86,255,.16), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      display:grid;
+      place-items:center;
+      padding:24px;
+      text-align:center;
+    }
+
+    .card{
+      width:min(560px, 100%);
+      background:var(--card);
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
+
+    .content{padding:22px 18px 26px; position:relative}
+
+    img{
+      width:min(280px, 78%);
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      display:block;
+      margin:10px auto 16px;
+    }
+
+    h1{margin:0 0 10px; font-size:28px}
+    p{margin:0; font-size:16px; line-height:1.55; color:var(--muted)}
+
+    .actions{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .btn{
+      display:inline-block;
+      padding:11px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.08);
+      color:rgba(255,255,255,.9);
+      font-weight:700;
+      text-decoration:none;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:13px;
+      color:rgba(255,255,255,.70);
+    }
+
+    /* hearts */
+    .hearts{position:fixed; inset:0; pointer-events:none; z-index:5;}
+    .heart{
+      position:absolute;
+      width:12px; height:12px;
+      background:#ff6fb1;
+      transform:rotate(45deg);
+      animation:floatUp 3.5s ease-out forwards;
+      border-radius:3px;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    }
+    .heart::before,.heart::after{
+      content:'';
+      position:absolute;
+      width:12px; height:12px;
+      background:inherit;
+      border-radius:50%;
+    }
+    .heart::before{left:-6px}
+    .heart::after{top:-6px}
+
+    @keyframes floatUp{
+      from{opacity:0; transform:translateY(20px) scale(.6) rotate(45deg)}
+      15%{opacity:1}
+      to{opacity:0; transform:translateY(-180px) scale(1.2) rotate(45deg)}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .heart{ animation:none; display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="hearts" aria-hidden="true"></div>
+
+  <main class="card">
+    <div class="content">
+      <img id="gif" src="kittenkiss.gif" alt="Gatitos besándose" />
+      <h1 id="title"></h1>
+      <p id="body"></p>
+
+      <div class="actions">
+        <button id="playBtn" class="btn" type="button">▶️ Reproducir canción</button>
+        <a class="btn" id="backBtn" href="index.html">Volver</a>
+      </div>
+
+      <div id="audioHint" class="hint">Si no suena, toca “Reproducir canción” 😊</div>
+    </div>
+  </main>
+
+  <script>
+    const LANG_KEY = 'valentine_lang';
+    const params = new URLSearchParams(location.search);
+
+    const herName = params.get('name') || 'Dara';
+
+    const STR = {
+      es:{
+        pageTitle: '¡Dijo que sí! 💖',
+        title:n=>`¡${n}, dijiste que sí! 💖`,
+        body:'Me acabas de hacer muy feliz.<br>Gracias por ser mi San Valentín 🥰',
+        back:'Volver',
+        play:'▶️ Reproducir canción',
+        playing:'🔊 Sonando',
+        hint:'Si no suena, toca “Reproducir canción” 😊'
+      },
+      en:{
+        pageTitle: 'She said yes! 💖',
+        title:n=>`${n}, you said yes! 💖`,
+        body:'You just made me really, really happy.<br>Thank you for being my Valentine 🥰',
+        back:'Back',
+        play:'▶️ Play song',
+        playing:'🔊 Playing',
+        hint:'If you don\'t hear it, tap “Play song” 😊'
+      }
+    };
+
+    let lang = (params.get('lang') || localStorage.getItem(LANG_KEY) || 'es').toLowerCase();
+    if(!STR[lang]) lang = 'es';
+
+    document.documentElement.lang = lang;
+    document.title = STR[lang].pageTitle;
+
+    const titleEl = document.getElementById('title');
+    const bodyEl = document.getElementById('body');
+    const backBtn = document.getElementById('backBtn');
+    const playBtn = document.getElementById('playBtn');
+    const audioHint = document.getElementById('audioHint');
+
+    titleEl.textContent = STR[lang].title(herName);
+    bodyEl.innerHTML = STR[lang].body;
+    backBtn.textContent = STR[lang].back;
+    playBtn.textContent = STR[lang].play;
+    audioHint.textContent = STR[lang].hint;
+
+    // ===== Hearts burst when GIF loads =====
+    const heartsWrap = document.querySelector('.hearts');
+    const gif = document.getElementById('gif');
+
+    function burstHearts(){
+      for(let i=0;i<14;i++){
+        const h = document.createElement('div');
+        h.className='heart';
+        h.style.left = (45 + Math.random()*10) + 'vw';
+        h.style.bottom = '40vh';
+        h.style.animationDelay = (Math.random()*0.6) + 's';
+        heartsWrap.appendChild(h);
+        setTimeout(()=>h.remove(), 4000);
+      }
+    }
+
+    gif.addEventListener('load', burstHearts);
+
+    // ===== Audio (starts at 1:31) =====
+    // Put your music file next to yes.html, e.g. song.mp3
+    const audio = new Audio('song.mp3');
+    audio.loop = true;
+    audio.volume = 0.85;
+
+    const START_TIME = 91; // 1:31
+
+    async function startAudio(){
+      try{
+        // wait for metadata so seeking works
+        if (audio.readyState < 1){
+          await new Promise(res => audio.addEventListener('loadedmetadata', res, { once:true }));
+        }
+
+        audio.currentTime = START_TIME;
+        await audio.play();
+
+        playBtn.textContent = STR[lang].playing;
+        audioHint.style.display = 'none';
+      }catch{
+        // Autoplay blocked until user interacts; button remains.
+      }
+    }
+
+    playBtn.addEventListener('click', startAudio);
+
+    // Try to start on first user interaction anywhere
+    window.addEventListener('pointerdown', startAudio, { once:true });
+
+    // Optional: pause when tab is hidden
+    document.addEventListener('visibilitychange', ()=>{
+      if (document.hidden) audio.pause();
+    });
+  </script>
+</body>
+</html>
